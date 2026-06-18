@@ -37,3 +37,9 @@ out/
 
 # Upload folder (optional)
 # uploads/
+
+uploads/
+.gradle/
+.idea/
+build/
+bin/
