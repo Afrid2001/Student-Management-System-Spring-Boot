@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeLeaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Student Management System</title>
+	<link rel="stylesheet"
+	      href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+	      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+	      crossorigin="anonymous">
+	<link rel="stylesheet"
+	      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-md">
+	<a class="navbar-brand" href="#">
+		<i class="fas fa-graduation-cap"></i> StudentHub
+	</a>
+
+	<div class="ml-auto order-md-last">
+		<a th:href="@{/logout}" class="btn btn-danger btn-sm">
+			<i class="fas fa-sign-out-alt"></i> Logout
+		</a>
+	</div>
+
+	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+		<span class="navbar-toggler-icon"></span>
+	</button>
+
+	<div class="collapse navbar-collapse" id="collapsibleNavbar">
+		<ul class="navbar-nav">
+			<li class="nav-item">
+				<a class="nav-link" th:href="@{/students}">
+					<i class="fas fa-list"></i> Students
+				</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" th:href="@{/change-password}">
+					<i class="fas fa-lock"></i> Security
+				</a>
+			</li>
+		</ul>
+	</div>
+</nav>
+
+<div class="container">
+	<!-- Header Section -->
+	<div class="row mb-5 animate-fade-in">
+		<div class="col-12">
+			<div style="margin-bottom: 2rem;">
+				<h1 style="color: var(--text-primary); margin-bottom: 0.5rem;">
+					<i class="fas fa-users" style="color: #8B5CF6;"></i> Student Management
+				</h1>
+				<p style="color: var(--text-secondary); font-size: 1rem;">
+					Manage and track all student information in one place
+				</p>
+			</div>
+		</div>
+	</div>
+
+	<!-- Stats Cards -->
+	<div class="row mb-4 animate-fade-in">
+		<!-- Total Students Card -->
+		<div class="col-lg-3 col-md-4 col-sm-6">
+			<div class="card stat-card">
+				<div class="card-body">
+					<div>
+						<h5><i class="fas fa-user-graduate"></i> Total Students</h5>
+						<p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem;">Active enrollment</p>
+					</div>
+					<div class="stat-number" th:text="${totalStudents}">0</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Photo Upload Card -->
+		<div class="col-lg-3 col-md-4 col-sm-6">
+			<div class="card stat-card" style="border-color: rgba(5, 150, 105, 0.2);">
+				<div class="card-body">
+					<div>
+						<h5><i class="fas fa-image"></i> Photo Upload</h5>
+						<p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem;">Profile pictures enabled</p>
+					</div>
+					<div style="font-size: 1.5rem; color: #10B981; font-weight: 600;">
+						<i class="fas fa-check-circle"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- PDF Export Card -->
+		<div class="col-lg-3 col-md-4 col-sm-6">
+			<div class="card stat-card" style="border-color: rgba(217, 119, 6, 0.2);">
+				<div class="card-body">
+					<div>
+						<h5><i class="fas fa-file-pdf"></i> PDF Export</h5>
+						<p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem;">Generate reports</p>
+					</div>
+					<div style="font-size: 1.5rem; color: #D97706; font-weight: 600;">
+						<i class="fas fa-check-circle"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Data Status Card -->
+		<div class="col-lg-3 col-md-4 col-sm-6">
+			<div class="card stat-card" style="border-color: rgba(59, 130, 246, 0.2);">
+				<div class="card-body">
+					<div>
+						<h5><i class="fas fa-database"></i> System Status</h5>
+						<p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem;">All systems operational</p>
+					</div>
+					<div style="font-size: 1.5rem; color: #3B82F6; font-weight: 600;">
+						<i class="fas fa-server"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Alert Messages -->
+	<div id="success-message" th:if="${session.successMessage}" class="alert alert-success animate-slide-up" role="alert">
+		<i class="fas fa-check-circle"></i>
+		<span th:text="${session.successMessage}"></span>
+	</div>
+
+	<div id="success-message-flag" style="display: none;">
+		<input type="hidden" id="showPopup" th:value="${session.successMessage != null ? 'true' : 'false'}" />
+	</div>
+
+	<!-- Action Bar -->
+	<div class="row mb-4 align-items-center animate-fade-in">
+		<div class="col-lg-6 col-md-6">
+			<form th:action="@{/students/search}" method="get" class="form-inline">
+				<input type="text"
+				       name="keyword"
+				       class="form-control mr-2"
+				       placeholder="🔍 Search by First Name"
+				       style="flex: 1; min-width: 250px;">
+				<button type="submit" class="btn btn-success">
+					<i class="fas fa-search"></i> Search
+				</button>
+			</form>
+		</div>
+
+		<div class="col-lg-6 col-md-6 text-right" style="text-align: right;">
+			<a th:href="@{/students/new}" class="btn btn-primary btn-lg">
+				<i class="fas fa-plus-circle"></i> Add New Student
+			</a>
+		</div>
+	</div>
+
+	<!-- Students Table -->
+	<div class="row animate-slide-up">
+		<div class="col-12">
+			<div class="card">
+				<div class="card-header">
+					<h5 style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+						<i class="fas fa-list-ul"></i> Student Records
+					</h5>
+				</div>
+
+				<div style="overflow-x: auto;">
+					<table class="table mb-0">
+						<thead>
+						<tr>
+							<th width="10%">Photo</th>
+							<th width="20%">First Name</th>
+							<th width="20%">Last Name</th>
+							<th width="25%">Email</th>
+							<th width="15%">College</th>
+							<th width="10%">Actions</th>
+						</tr>
+						</thead>
+						<tbody>
+						<tr th:each="student: ${students}" th:if="${not #lists.isEmpty(students)}">
+							<td>
+								<div style="display: flex; align-items: center; justify-content: center;">
+									<img th:if="${student.photo != null}"
+									     th:src="@{'/uploads/' + ${student.photo}}"
+									     width="45"
+									     height="45"
+									     style="border-radius: 50%; border: 2px solid var(--secondary-color);"
+									     alt="Student photo">
+									<div th:unless="${student.photo != null}"
+									     style="width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, #5B21B6, #8B5CF6); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+										<i class="fas fa-user"></i>
+									</div>
+								</div>
+							</td>
+							<td style="font-weight: 500;" th:text="${student.firstName}"></td>
+							<td th:text="${student.lastName}"></td>
+							<td style="color: #A78BFA;" th:text="${student.email}"></td>
+							<td>
+                                    <span class="badge badge-primary">
+                                        <i class="fas fa-building"></i> <span th:text="${student.collegeName}"></span>
+                                    </span>
+							</td>
+							<td>
+								<div class="action-buttons">
+									<a th:href="@{/students/view/{id}(id=${student.id})}"
+									   class="btn btn-sm btn-warning"
+									   title="View Details">
+										<i class="fas fa-eye"></i>
+									</a>
+
+									<a th:href="@{/students/edit/{id}(id=${student.id})}"
+									   class="btn btn-sm btn-primary"
+									   title="Edit Student">
+										<i class="fas fa-edit"></i>
+									</a>
+
+									<a th:href="@{/students/{id}(id=${student.id})}"
+									   class="btn btn-sm btn-danger"
+									   title="Delete Student"
+									   onclick="return confirm('Are you sure?');">
+										<i class="fas fa-trash-alt"></i>
+									</a>
+								</div>
+							</td>
+						</tr>
+
+						<tr th:if="${#lists.isEmpty(students)}">
+							<td colspan="6" class="text-center" style="padding: 2rem;">
+								<i class="fas fa-inbox" style="font-size: 2rem; color: var(--text-secondary); margin-bottom: 1rem; display: block;"></i>
+								<p style="color: var(--text-secondary);">No students found.
+									<a th:href="@{/students/new}" style="color: #A78BFA; text-decoration: underline;">Add one now</a>
+								</p>
+							</td>
+						</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"></script>
+
+<script>
+	document.addEventListener("DOMContentLoaded", function() {
+		// Hide success message after 5 seconds
+		function hideSuccessMessage() {
+			var successMessageElement = document.getElementById('success-message');
+			if (successMessageElement) {
+				setTimeout(function() {
+					successMessageElement.style.display = 'none';
+					fetch('/resetSuccessMessage', { method: 'POST' }).catch(e => {});
+				}, 5000);
+			}
+		}
+
+		// Check for popup flag
+		var showPopupElement = document.getElementById('showPopup');
+		if (showPopupElement && showPopupElement.value === "true") {
+			var successMessageElement = document.getElementById('success-message');
+			if (successMessageElement) {
+				successMessageElement.style.display = 'block';
+				hideSuccessMessage();
+			}
+		}
+
+		// Add smooth scroll animation
+		document.querySelectorAll('a[th\\:href]').forEach(el => {
+			el.addEventListener('click', function(e) {
+				// Prevent default only if hash link
+				if (this.getAttribute('th:href') && this.getAttribute('th:href').startsWith('#')) {
+					e.preventDefault();
+				}
+			});
+		});
+	});
+</script>
+
+</body>
+</html>
